@@ -15,7 +15,12 @@
 #include <string.h>
 #include <err.h>
 #include <pcap.h>
-#ifdef BSD
+#ifdef __APPLE__
+// This struct is much larger, but fd seems to be the first member so should be fine maybe.
+struct pcap {
+	int fd;
+};
+#elif defined(BSD)
 #include <pcap-int.h>
 #endif
 
@@ -25,7 +30,11 @@
 static int
 bpf_immediate(int fd, int on)
 {
+#ifdef __APPLE__
+	return 0;
+#else
 	return (ioctl(fd, BIOCIMMEDIATE, &on));
+#endif
 }
 #endif
 
